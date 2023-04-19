@@ -9,7 +9,7 @@ class Clause:
         
         self.beliefCnf = to_cnf(belief)
         self.beliefCnf_negated = ~self.beliefCnf
-        self.litterals = list(self.beliefCnf.args)
+        self.literals = list(self.beliefCnf.args)
 
     def __repr__(self):
         return str(self.beliefCnf)
