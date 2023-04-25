@@ -21,7 +21,7 @@ class Belief_base:
     def ASK(self, alpha):
         # Check if belief is a tautology
         not_alpha = ~(alpha)
-        print(to_cnf(not_alpha))
+        #print(to_cnf(not_alpha))
         res = self.is_tautology(not_alpha)
         if res:
             return True
@@ -36,7 +36,7 @@ class Belief_base:
         else:
             query_list.append(Clause(not_alpha))
         
-        print("alpha", query_list)
+        #print("alpha", query_list)
         # Resolve by contradiction
         return self._pl_resolution(query_list)
     
@@ -111,8 +111,8 @@ class Belief_base:
                     #print(f"resolvents: {resolvents}")
                         
             if new_clauses.issubset(clauses):
-                print(f"Current set of clauses (issubset): {clauses}")
-                print(f"new_clauses: {new_clauses}")
+                #print(f"Current set of clauses (issubset): {clauses}")
+                #print(f"new_clauses: {new_clauses}")
                 return False
                     
             clauses = clauses.union(new_clauses)
@@ -223,6 +223,20 @@ class Belief_base:
 # print('KB = ', Agent6.beliefBase)
 
 # alpha = (A & B) | (~A & C)
+
+# print(Agent6.ASK(alpha))   # Expected output: True
+
+
+# # Test case 8
+# print("TEST CASE 8")
+# Agent6 = Belief_base()
+# Agent6.TELL(A | B)
+# Agent6.TELL(~A | C)
+# Agent6.TELL(B & C)
+
+# print('KB = ', Agent6.beliefBase)
+
+# alpha = D
 
 # print(Agent6.ASK(alpha))   # Expected output: True
 

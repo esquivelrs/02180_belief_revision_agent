@@ -1,5 +1,5 @@
 from unittest import TestCase
-from sympy.abc import A, B, C, D
+from sympy.abc import A, B, C, D, E
 from sympy.logic.boolalg import *
 from belief_base import Belief_base
 from clause import Clause
@@ -9,15 +9,13 @@ class TestBeliefBase(TestCase):
         self.bb = Belief_base()
 
     def test_tautology(self):
-        self.bb.TELL(A | B)
-        self.bb.TELL(~A | B)
-        self.bb.TELL(A | ~B)
         self.assertTrue(self.bb.ASK(A | ~A))
         
     def test_single_clause(self):
         self.bb.TELL(A)
         self.assertTrue(self.bb.ASK(A))
         self.assertFalse(self.bb.ASK(~A))
+        self.assertFalse(self.bb.ASK(E))
         #print("TRUE")
 
     def test_multiple_clauses(self):
@@ -33,6 +31,13 @@ class TestBeliefBase(TestCase):
         self.bb.TELL(~A | C)
         self.bb.TELL(B & C)
         self.assertTrue(self.bb.ASK((A & B) | (~A & C)))
+
+
+    def test_implication(self):
+        self.bb.TELL(~A>>B)
+        self.bb.TELL(B>>A)
+        self.bb.TELL(A >> (C & D))
+        self.assertTrue(self.bb.ASK(A&C&D))
 
 
 import unittest
