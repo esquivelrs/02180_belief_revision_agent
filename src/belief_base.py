@@ -9,13 +9,12 @@ class Belief_base:
     def __init__(self):
         self.beliefBase = []
     
+    
     def TELL(self, belief):
-        if isinstance(to_cnf(belief), And):
-            clauses = to_cnf(belief).args
-            for clause in clauses:
-                self.beliefBase.append(Clause(clause))
-        else:
-            self.beliefBase.append(Clause(belief))
+        
+        clause = Clause(belief)
+        self.beliefBase.append(clause)
+        return clause.CNF_clauses
 
 
     def ASK(self, alpha):
@@ -39,8 +38,7 @@ class Belief_base:
         #print("alpha", query_list)
         # Resolve by contradiction
         return self._pl_resolution(query_list)
-    
-    
+   
     
     def is_tautology(self, belief):
         # Convert the expression to CNF
@@ -116,16 +114,19 @@ class Belief_base:
                 return False
                     
             clauses = clauses.union(new_clauses)
-        
+
 
 # # Test case 1
 # print("TEST CASE 1")
 # Agent1 = Belief_base()
 # Agent1.TELL(A)
 
+
 # print('KB = ', Agent1.beliefBase)
 
 # alpha = A 
+
+# # print(Agent1.beliefBase[0].literals)
 
 # print(Agent1.ASK(alpha))  # Expected output: True
 
