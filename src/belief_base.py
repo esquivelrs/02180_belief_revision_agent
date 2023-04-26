@@ -1,79 +1,163 @@
 # Class to handle belief base and updates
 from clause import Clause
-from sympy.abc import A, B, C, D
-from sympy.logic.boolalg import to_cnf, And
+from sympy.abc import A, B, C, D, E
+from sympy.logic.boolalg import *
+from sympy import symbols
 
-class belief_base:
+
+class Belief_base:
     def __init__(self):
         self.beliefBase = []
-        self.currentID = 1
+    
     
     def TELL(self, belief):
-    
-        if isinstance(to_cnf(belief), And):
-            clauses = to_cnf(belief).args
-            for clause in clauses:
-                self.beliefBase.append(Clause(self.currentID, clause))
-                self.currentID += 1
-        else:
-            self.beliefBase.append(Clause(self.currentID, belief))
-            self.currentID += 1
+        
+        clause = Clause(belief)
+        self.beliefBase.append(clause)
+        return clause.CNF_clauses
 
 
-    def ASK(self, belief):
+    def ASK(self, alpha):
+        # Check if belief is a tautology
+        not_alpha = ~(alpha)
+        #print(to_cnf(not_alpha))
+        res = self.is_tautology(not_alpha)
+        if res:
+            return True
+        
         # Create the clause we want to query
-        query_clause = Clause(0, belief)
-        # Negate (done in Clause)
-        # Convert to CNF (done in Clause)
-
-        # Add new clause to belief base
-        temp_belief_base = self.beliefBase.copy()
-        temp_belief_base.append(query_clause)
-
+        #query_clause = Clause(~belief)
+        query_list = []
+        if isinstance(to_cnf(not_alpha), And):
+            clauses = to_cnf(not_alpha).args
+            for clause in clauses:
+                query_list.append(Clause(clause))
+        else:
+            query_list.append(Clause(not_alpha))
+        
+        #print("alpha", query_list)
         # Resolve by contradiction
-        return self.resolve_by_contradiction(temp_belief_base)
+        return self._pl_resolution(query_list)
+   
+    
+    def is_tautology(self, belief):
+        # Convert the expression to CNF
+        cnf_expr = to_cnf(belief)
+        # Extract the variables from the expression
+        variables = list(cnf_expr.free_symbols)
+        # Construct the truth table for the expression
+        for values in product([False, True], repeat=len(variables)):
+            assignment = dict(zip(variables, values))
+            if not cnf_expr.subs(assignment):
+                return False
+        return True
+
+    def is_contradiction(self, belief):
+        # Convert the expression to CNF
+        cnf_expr = to_cnf(belief)
+
+        # Extract the variables from the expression
+        variables = list(cnf_expr.free_symbols)
+
+        # Construct the truth table for the expression
+        for values in product([False, True], repeat=len(variables)):
+            assignment = dict(zip(variables, values))
+            if cnf_expr.subs(assignment):
+                return False
+        return True
+
+    def _pl_resolve(self, clause1, clause2):
+        resolvents = []
+        # print(f"Clause 1: {clause1} Clause 2: {clause2} --> {clause1.literals} and {clause2.literals}...")
+        for literal1 in clause1.literals:
+            for literal2 in clause2.literals:
+                
+                # print(f"Resolving {literal1} and {literal2}... ", literal1==~literal2 )
+                if literal1 == ~literal2:
+                    new_literals = list(clause1.literals) + list(clause2.literals)
+                    new_literals.remove(literal1)
+                    new_literals.remove(literal2)
+                    # Check that literals are not used twice in new clause
+                    #if len(set(new_literals)) == len(new_literals):
+                    new_clause = Clause(Or(*new_literals))
+                    # print(f"New clause: {new_clause}")
+                    
+                    if new_clause not in resolvents:
+                        resolvents.append(new_clause)
+
+        return resolvents
+
+    #pl_resolve(Clause(A|B), Clause(A|~B))
+
+    def _pl_resolution(self, notalpha):
+        clauses = set(self.beliefBase + notalpha)
+
+        while True:
+            # print(f"Current set of clauses: {clauses}")
+            new_clauses = set()
+            clauses_list = list(clauses)
+            pairs = [(clauses_list[i], clauses_list[j]) for i in range(len(clauses_list)) for j in range(i+1, len(clauses_list))]
+            for (ci, cj) in pairs:
+                #if ci != cj:
+                resolvents = self._pl_resolve(ci, cj)
+                for resolvent in resolvents:
+                    if resolvent.beliefCnf == False:
+                        return True
+                    
+                    new_clauses.add(resolvent)
+                            
+                    #print(f"resolvents: {resolvents}")
+                        
+            if new_clauses.issubset(clauses):
+                #print(f"Current set of clauses (issubset): {clauses}")
+                #print(f"new_clauses: {new_clauses}")
+                return False
+                    
+            clauses = clauses.union(new_clauses)
+
+
+# # Test case 1
+# print("TEST CASE 1")
+# Agent1 = Belief_base()
+# Agent1.TELL(A)
 
 
 
+# alpha = A 
 
-def pl_resolve(clause1, clause2):
-    # Create new clause
-    resulting_literals = []
-    # Add literals from clause1
-    for literal in clause1.literals:
-        if ~literal not in clause2.literals:
-            resulting_literals.append(literal)
-    # Return new clause
-    return resulting_literals
+# # print(Agent1.beliefBase[0].literals)
+# print(Agent1.ASK(alpha))  # Expected output: True
 
 
+# # Test case 2
+# print("TEST CASE 2")
+# Agent2 = Belief_base()
+# Agent2.TELL(A | B)
+# Agent2.TELL(C | D)
+# Agent2.TELL(~C | ~D)
 
-def pl_resolution(KB, alpha):
-    # Given a knowledge base KB and a query alpha, return True if alpha can be inferred from KB, and False otherwise
+# print('KB = ', Agent2.beliefBase)
 
-    while len(alpha.literals) is not 0:
-        for clause in KB:
-            alpha.literals = pl_resolve(alpha, clause)     # TODO alpha should be negated for input
-            print(alpha.literals)
-        break
+# alpha = A
 
 
+# print(Agent2.ASK(alpha))   # Expected output: False
 
 
-clause_1 = Clause(0, ~A >> B)
-clause_2 = Clause(0, B >> A)
-clause_3 = Clause(0, A >> (C & D))
+#clause_1 = Clause(0, ~A >> B)
+#clause_2 = Clause(0, B >> A)
+#clause_3 = Clause(0, A >> (C & D))
 
-Agent1 = belief_base()
-Agent1.TELL(clause_1)
-Agent1.TELL(clause_2)
-Agent1.TELL(clause_3)
-print('KB = ', Agent1.beliefBase)
+#Agent1 = belief_base()
+#Agent1.TELL(clause_1)
+#Agent1.TELL(clause_2)
+#Agent1.TELL(clause_3)
+#print('KB = ', Agent1.beliefBase)
 
-alpha = Clause(0, ~(~A | C & D))        # TODO alpha cannot as of now be a sentence (multiple clauses)... Lucas fix this (e.g. by creating a list of alpha-clauses we loop over)
-print('alpha litterals = ', alpha.literals)
+#alpha = Clause(0, ~(~A | C & D))        # TODO alpha cannot as of now be a sentence (multiple clauses)... Lucas fix this (e.g. by creating a list of alpha-clauses we loop over)
+#print('alpha litterals = ', alpha.literals)
 
-pl_resolution(Agent1.beliefBase, alpha)
+#pl_resolution(Agent1.beliefBase, alpha)
 
 
 
@@ -84,25 +168,103 @@ pl_resolution(Agent1.beliefBase, alpha)
 # print(pl_resolve(clause_1, clause_2))
 
 
-# # Test TELL:
-# Agent1 = belief_base()
-# Agent1.TELL(~(A & B & C))
-# Agent1.TELL(A >> (C & B))
-# print(Agent1.beliefBase)
+# # Test case 3
+# print("TEST CASE 3")
+# Agent3 = Belief_base()
+# Agent3.TELL(A & B)
+# Agent3.TELL(C & D)
 
-# Test ASK:
+# print('KB = ', Agent3.beliefBase)
 
+# alpha = ~A
 
-            
-
-# Test PL_resolve:
-# Agent1 = belief_base()
-# Agent1.TELL(~(A & B & C))
-# Agent1.TELL(A >> B)
-# print(Agent1.beliefBase)
-# print(Agent1.PL_resolve(Agent1.beliefBase[0], Agent1.beliefBase[1]))
+# print(Agent3.ASK(alpha))  # Expected output: False
 
 
+
+# # Test case 4
+# print("TEST CASE 4")
+# Agent4 = Belief_base()
+# Agent4.TELL(A | B)
+# Agent4.TELL(C | D)
+
+# print('KB = ', Agent4.beliefBase)
+
+# alpha = E
+
+# print(Agent4.ASK(alpha))   # Expected output: False
+
+
+# # Test case 5
+# print("TEST CASE 5")
+# Agent5 = Belief_base()
+# Agent5.TELL(~A>>B)
+# Agent5.TELL(B>>A)
+# Agent5.TELL(A >> (C & D))
+
+# print('KB = ', Agent5.beliefBase)
+
+# alpha = A&C&D
+
+# print(Agent5.ASK(alpha))   # Expected output: False
+
+
+
+# # Test case 6
+# print("TEST CASE 2")
+# Agent6 = Belief_base()
+# Agent6.TELL(A | B)
+# Agent6.TELL(~A | B)
+# Agent6.TELL(A | ~B)
+
+# print('KB = ', Agent6.beliefBase)
+
+# alpha = ~B
+
+# print(Agent6.ASK(alpha))   # Expected output: False
+
+
+# # Test case 7
+# print("TEST CASE 2")
+# Agent6 = Belief_base()
+# Agent6.TELL(A | B)
+# Agent6.TELL(~A | B)
+# Agent6.TELL(A | ~B)
+
+# print('KB = ', Agent6.beliefBase)
+
+# alpha = A | ~A
+
+# print(Agent6.ASK(alpha))   # Expected output: True
+
+
+# # Test case 8
+# print("TEST CASE 8")
+# Agent6 = Belief_base()
+# Agent6.TELL(A | B)
+# Agent6.TELL(~A | C)
+# Agent6.TELL(B & C)
+
+# print('KB = ', Agent6.beliefBase)
+
+# alpha = (A & B) | (~A & C)
+
+# print(Agent6.ASK(alpha))   # Expected output: True
+
+
+# # Test case 8
+# print("TEST CASE 8")
+# Agent6 = Belief_base()
+# Agent6.TELL(A | B)
+# Agent6.TELL(~A | C)
+# Agent6.TELL(B & C)
+
+
+# print('KB = ', Agent6.beliefBase)
+
+# alpha = D
+
+# print(Agent6.ASK(alpha))   # Expected output: True
 
 
 
