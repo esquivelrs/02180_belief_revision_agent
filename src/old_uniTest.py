@@ -1,8 +1,8 @@
 from unittest import TestCase
 from sympy.abc import A, B, C, D, E
 from sympy.logic.boolalg import *
-from belief_base import Belief_base
-from clause import Clause
+from .belief_base import Belief_base
+from .clause import Clause
 
 class TestBeliefBase(TestCase):
     def setUp(self):
@@ -45,6 +45,13 @@ class TestBeliefBase(TestCase):
         self.bb.TELL(B>>A)
         self.bb.TELL(A >> (C & D))
         self.assertTrue(self.bb.ASK(A&C&D))
+        
+    def test_KB(self):
+        self.bb.TELL(~A>>B)
+        self.bb.TELL(B>>A)
+        self.bb.TELL(A >> (C & D))
+        self.assertTrue(self.bb.ASK(A&C&D))
+
 
 
 import unittest

@@ -1,5 +1,5 @@
 # Class to handle belief base and updates
-from clause import Clause
+from .clause import Clause
 from sympy.abc import A, B, C, D, E
 from sympy.logic.boolalg import *
 from sympy import symbols
@@ -23,9 +23,11 @@ class Belief_base:
     def TELL(self, belief):
         # print("KB ", self.beliefBase)
         # print("BELIEF: ", belief)
-        clause = Clause(belief)
-        
-        self._revision(clause)
+        if not self.ASK(belief): # if the KB entails the belief, add the belief is not requiered
+            
+            clause = Clause(belief)
+            
+            self._revision(clause)
 
     def expansion(self, clause):
         self.beliefBase.append(clause)
