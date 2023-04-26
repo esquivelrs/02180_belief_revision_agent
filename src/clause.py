@@ -35,7 +35,16 @@ class Clause:
         
         else:
             #print(self.CNF_clauses)
-            split_by_clauses = np.array([clause.args if isinstance(clause, Or) else clause for clause in self.CNF_clauses ]).flatten()
+            #split_by_clauses = np.array([clause.args if isinstance(clause, Or) else clause for clause in self.CNF_clauses ]).flatten()
+            split_by_clauses = []
+            for clause in self.CNF_clauses:
+                #print(f"Clause {clause}")
+                if isinstance(clause, Or):
+                    #print(f"Has an OR ", clause.args)
+                    split_by_clauses += clause.args
+                else:
+                    split_by_clauses.append(clause)
+            
             #print(split_by_clauses)
             split_by_literals = list(split_by_clauses)
             self.literals = split_by_literals
@@ -45,8 +54,8 @@ class Clause:
     def __repr__(self):
         return str(self.beliefCnf)
     
-    def __str__(self):
-        return str(self.beliefCnf) + "_" + str(self.belief_rank)
+    # def __str__(self):
+    #     return str(self.beliefCnf) + "_" + str(self.belief_rank)
     
     def __eq__(self, other):
         return self.beliefCnf == other.beliefCnf
@@ -59,5 +68,5 @@ class Clause:
 
 # print(Clause(~A).literals)
 
-#print(Clause(~(A | ~C)).literals)
+#print(Clause(~(A >> (C & D))).literals)
 
