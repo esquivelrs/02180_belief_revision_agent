@@ -122,12 +122,10 @@ class Belief_base:
 # Agent1.TELL(A)
 
 
-# print('KB = ', Agent1.beliefBase)
 
 # alpha = A 
 
 # # print(Agent1.beliefBase[0].literals)
-
 # print(Agent1.ASK(alpha))  # Expected output: True
 
 
@@ -142,7 +140,32 @@ class Belief_base:
 
 # alpha = A
 
+
 # print(Agent2.ASK(alpha))   # Expected output: False
+
+
+#clause_1 = Clause(0, ~A >> B)
+#clause_2 = Clause(0, B >> A)
+#clause_3 = Clause(0, A >> (C & D))
+
+#Agent1 = belief_base()
+#Agent1.TELL(clause_1)
+#Agent1.TELL(clause_2)
+#Agent1.TELL(clause_3)
+#print('KB = ', Agent1.beliefBase)
+
+#alpha = Clause(0, ~(~A | C & D))        # TODO alpha cannot as of now be a sentence (multiple clauses)... Lucas fix this (e.g. by creating a list of alpha-clauses we loop over)
+#print('alpha litterals = ', alpha.literals)
+
+#pl_resolution(Agent1.beliefBase, alpha)
+
+
+
+
+# Test PL_resolve:
+# clause_1 = Clause(0, A | B | ~C)
+# clause_2 = Clause(0, A | B | C)
+# print(pl_resolve(clause_1, clause_2))
 
 
 # # Test case 3
@@ -156,6 +179,7 @@ class Belief_base:
 # alpha = ~A
 
 # print(Agent3.ASK(alpha))  # Expected output: False
+
 
 
 # # Test case 4
@@ -234,6 +258,7 @@ class Belief_base:
 # Agent6.TELL(A | B)
 # Agent6.TELL(~A | C)
 # Agent6.TELL(B & C)
+
 
 # print('KB = ', Agent6.beliefBase)
 

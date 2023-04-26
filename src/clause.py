@@ -13,6 +13,7 @@ class Clause:
         self.belief = belief
         self.beliefCnf = to_cnf(self.belief)
         self.beliefCnf_negated = ~self.beliefCnf
+
         
         self.CNF_clauses = []
         self.value = rnd.random()
@@ -37,6 +38,7 @@ class Clause:
             self.literals = split_by_literals
    
     
+
     def __repr__(self):
         return str(self.beliefCnf)
     
