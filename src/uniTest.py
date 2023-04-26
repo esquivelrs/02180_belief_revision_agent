@@ -38,6 +38,13 @@ class TestBeliefBase(TestCase):
         self.bb.TELL(B>>A)
         self.bb.TELL(A >> (C & D))
         self.assertTrue(self.bb.ASK(A&C&D))
+        
+    
+    def test_implication(self):
+        self.bb.TELL(~A>>B)
+        self.bb.TELL(B>>A)
+        self.bb.TELL(A >> (C & D))
+        self.assertTrue(self.bb.ASK(A&C&D))
 
 
 import unittest

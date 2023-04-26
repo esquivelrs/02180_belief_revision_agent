@@ -12,11 +12,11 @@ class Clause:
         Clause.next_id += 1
         self.belief = belief
         self.beliefCnf = to_cnf(self.belief)
-        self.beliefCnf_negated = ~self.beliefCnf
 
         
         self.CNF_clauses = []
-        self.value = rnd.random()
+        #self.belief_rank = rnd.random()
+        self.belief_rank = self.ID
         self.split_clauses()
         self.literals = []
         self.get_literals()
@@ -32,15 +32,21 @@ class Clause:
     def get_literals(self):
         if len(self.belief.atoms()) == 1:
             self.literals = [to_cnf(self.belief)]
+        
         else:
-            split_by_clauses = np.array([clause.args for clause in self.CNF_clauses])
-            split_by_literals = list(split_by_clauses.flatten())
+            #print(self.CNF_clauses)
+            split_by_clauses = np.array([clause.args if isinstance(clause, Or) else clause for clause in self.CNF_clauses ]).flatten()
+            #print(split_by_clauses)
+            split_by_literals = list(split_by_clauses)
             self.literals = split_by_literals
    
     
 
     def __repr__(self):
         return str(self.beliefCnf)
+    
+    def __str__(self):
+        return str(self.beliefCnf) + "_" + str(self.belief_rank)
     
     def __eq__(self, other):
         return self.beliefCnf == other.beliefCnf
@@ -53,5 +59,5 @@ class Clause:
 
 # print(Clause(~A).literals)
 
-#print(Clause(A)==Clause(A))
+#print(Clause(~(A | ~C)).literals)
 
