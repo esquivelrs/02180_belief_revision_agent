@@ -1,10 +1,12 @@
 # Class to handle belief base and updates
-from .clause import Clause
+from clause import Clause       # Before .clause... didn't work?
 from sympy.abc import A, B, C, D, E
 from sympy.logic.boolalg import *
 from sympy import symbols
 from copy import deepcopy
+import numpy as np
 
+# TODO : Add check for contradiction (example A and ~A is added to the KB)... Doesn't work with the current implementation.
 
 class Belief_base:
     def __init__(self):
