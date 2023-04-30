@@ -3,7 +3,6 @@ from sympy import And, Or, Not
 from sympy.logic.boolalg import to_cnf, to_dnf
 from sympy.logic.boolalg import is_cnf
 from src.belief_base import Belief_base
-from src.clause import Clause
 
 
 
