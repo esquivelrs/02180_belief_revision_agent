@@ -62,12 +62,13 @@ class TestBeliefBase(TestCase):
         bb.TELL(A)
         assert bb.ASK(~A) == False
 
-    # # Tests that TELL with an empty belief does not add anything to the belief base. 
-    # def test_TELL_empty_belief(self):
-    #     bb = Belief_base()
-    #     bb.TELL('')
-    #     print(bb.beliefBase)
-    #     assert bb.beliefBase == []
+    # Tests that TELLs a contradiction. 
+    def test_TELL_contradiction(self):
+        bb = Belief_base()
+        bb.TELL(A & ~A)
+        #print("BBBBBB ", bb.beliefBase)
+        assert len(bb.beliefBase) == 0       
+    
 
     # Tests that TELL with a single literal adds a new clause to the belief base. 
     def test_TELL_single_literal(self):
@@ -135,9 +136,10 @@ class TestBeliefBase(TestCase):
         bb.TELL(B | C)
         bb.TELL(C | A)
         bb.TELL(A | B | C)        
-        assert len(bb.beliefBase) == 3
-        bb.TELL(D)   # TODO A | B | C | D
-        assert len(bb.beliefBase) == 4
+        assert len(bb.beliefBase) == 7
+        bb.TELL(D)  
+        assert len(bb.beliefBase) == 8
+        #print("######### KB" , bb.beliefBase)
 
     # Tests that _revision removes contradictions to the clause from the belief base.   
     def test_revision_contradiction(self):
@@ -149,9 +151,11 @@ class TestBeliefBase(TestCase):
         bb.TELL(B | C)
         bb.TELL(C | A)
         bb.TELL(A | B | C)  
-        assert len(bb.beliefBase) == 3
+        assert len(bb.beliefBase) == 7
+        #print("BBBBBBBB ", bb.beliefBase)
         bb.TELL(~(A | B))
-        assert len(bb.beliefBase) == 2
+        #print("BBBBBBBB ", bb.beliefBase)
+        assert len(bb.beliefBase) == 5
 
     # Tests that _revision handles duplicate clauses in belief base.   
     def test_revision_duplicate_clauses(self):
@@ -163,9 +167,9 @@ class TestBeliefBase(TestCase):
         bb.TELL(B | C)
         bb.TELL(C | A)
         bb.TELL(A | B | C) 
-        assert len(bb.beliefBase) == 3
+        assert len(bb.beliefBase) == 7
         bb.TELL(A | B | C)
-        assert len(bb.beliefBase) == 3
+        assert len(bb.beliefBase) == 7
 
     # Tests that _revision handles clauses with multiple literals.    
     def test_revision_multiple_literals(self):
@@ -222,6 +226,40 @@ class TestBeliefBase(TestCase):
         bb.TELL(~C & ~D & ~E & ~F & ~G & ~H & ~I & ~J & ~K & ~L & ~M & ~N & ~O & ~P & ~Q & ~R & ~S & ~T & ~U & ~V & ~W & ~X & ~Y & ~Z)
 
         assert len(bb.beliefBase) == 2
+
+    def test_revision_belief_Low_rank(self):
+        bb = Belief_base()
+        bb.TELL(A)
+        bb.TELL(B)
+        bb.TELL(C)
+        bb.TELL(A | B)
+        bb.TELL(B | C)
+        bb.TELL(C | A)
+        bb.TELL(A | B | C)  
+        assert len(bb.beliefBase) == 7
+        #print("BBBBBBBB ", bb.beliefBase)
+        clause = Clause(~(A | B))
+        clause.belief_rank = 0
+        bb._revision(clause)
+        #print("BBBBBBBB ", bb.beliefBase)
+        assert len(bb.beliefBase) == 7
+
+    def test_revision_belief_High_rank(self):
+        bb = Belief_base()
+        bb.TELL(A)
+        bb.TELL(B)
+        bb.TELL(C)
+        bb.TELL(A | B)
+        bb.TELL(B | C)
+        bb.TELL(C | A)
+        bb.TELL(A | B | C)  
+        assert len(bb.beliefBase) == 7
+        #print("BBBBBBBB ", bb.beliefBase)
+        clause = Clause(~(A | B))
+        clause.belief_rank = 10000
+        bb._revision(clause)
+        #print("BBBBBBBB ", bb.beliefBase)
+        assert len(bb.beliefBase) == 5
 
 
 

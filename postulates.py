@@ -3,8 +3,8 @@ from sympy.logic.boolalg import *
 import random as rnd
 import numpy as np
 import copy as copy
-from belief_base import Belief_base
-from clause import Clause
+from src.belief_base import Belief_base
+from src.clause import Clause
 
 BB = Belief_base()
 BB.TELL((A & B))
@@ -136,30 +136,30 @@ def AGM_postulate_extensionality(BB, query1, query2):
 
 #### TESTS ####
 
-print('--- AGM postulate 1: Closure ---')
+print('\n--- AGM postulate 1: Closure ---')
 BB = Belief_base()
 AGM_postulate_closure(BB, C)
 
-print('--- AGM postulate 2: Success ---')
+print('\n--- AGM postulate 2: Success ---')
 BB = Belief_base()
 AGM_postulate_success(BB, C)
 
-print('--- AGM postulate 3: Inclusion ---')
+print('\n--- AGM postulate 3: Inclusion ---')
 BB = Belief_base()
 BB.TELL(A & B)
 AGM_postulate_inclusion(BB, C)
 
-print('--- AGM postulate 4: Vacuity ---')
+print('\n--- AGM postulate 4: Vacuity ---')
 BB = Belief_base()
 BB.TELL(A)
 AGM_postulate_vacuity(BB, C)
 
-print('--- AGM postulate 5: Consistency ---')
+print('\n--- AGM postulate 5: Consistency ---')
 BB = Belief_base()
 BB.TELL(~C & ~B)
 AGM_postulate_consistency(BB, (C))
 
-print('---AGM postulate 6: Extensionality---')
+print('\n---AGM postulate 6: Extensionality---')
 BB = Belief_base()
 BB.TELL(A & B)
 AGM_postulate_extensionality(BB, C | D, D | C)
