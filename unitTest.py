@@ -137,7 +137,7 @@ class TestBeliefBase(TestCase):
         bb.TELL(C | A)
         bb.TELL(A | B | C)        
         assert len(bb.beliefBase) == 7
-        bb.TELL(D)   # TODO A | B | C | D
+        bb.TELL(D)  
         assert len(bb.beliefBase) == 8
         #print("######### KB" , bb.beliefBase)
 
