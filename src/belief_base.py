@@ -265,7 +265,54 @@ class Belief_base:
 # Agent6.TELL(~B)
 # print_debug('KB = ', Agent6.beliefBase)
 
+BB = Belief_base()
+# Game rules:
+s1 = Symbol('s1') 
+s2 = Symbol('s2') 
+t1 = Symbol('t1') 
+t2 = Symbol('t2') 
+d1 = Symbol('d1') 
+d2 = Symbol('d2') 
 
+# BB.TELL(s1 | t1 | d1)
+# BB.TELL(s2 | t2 | d2)
+
+# print(BB.beliefBase)
+
+# #(:t1 _ :s1) ^ (:s1 _ :d1) ^ (:d1 _ :t1)
+# BB.TELL((~t1 | ~s1) & (~s1 | ~d1) & (~d1 | ~t1))
+# #(:t2 _ :s2) ^ (:s2 _ :d2) ^ (:d2 _ :t2)
+
+# BB.TELL((~t2 | ~s2) & (~s2 | ~d2) & (~d2 | ~t2))
+
+# #(t1 _ d2) ^ (:d2 _ :t1)
+# BB.TELL((t1 | d2) & (~t1 | ~d2))
+
+# #print('Is true = ', BB.ASK(s1 & d2))
+
+# print(BB.beliefBase)
+
+
+
+Agent6 = Belief_base()
+
+# [d1 | s1 | t1
+#  d2 | s2 | t2
+#  ~d1 | ~s1
+#  ~d1 | ~t1
+#  ~s1 | ~t1
+#  ~d2 | ~s2
+#  ~d2 | ~t2
+#  ~s2 | ~t2
+#  d2 | t1
+#  ~d2 | ~t1]
+hh = [Clause(~d2 | ~s2), 
+      Clause(~d2 | ~t2), 
+      Clause(~s2 | ~t2), 
+      Clause(d2 | t1), 
+      Clause(~d2 | ~t1)]
+
+print(Agent6._pl_resolution(hh, Clause(~d2 | ~t1)))
 
 
 #print_debug(Agent6.is_contradiction(A))
